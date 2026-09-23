@@ -19,16 +19,9 @@ For a quick correctness pass on a small diff, this is overkill — read the diff
 
 ## Phase 0 — Ground truth
 
-Read the repo's own conventions first (`AGENTS.md`, `CONTRIBUTING.md`, `CLAUDE.md`), then pull the PR with whatever CLI the host uses:
+Read the repo's own conventions first (`AGENTS.md`, `CONTRIBUTING.md`, `CLAUDE.md`). Then pull the PR's title, body, base branch and head branch with whatever CLI or API your code host provides, and fetch the branches:
 
 ```bash
-# GitHub
-gh pr view <N> --json title,body,baseRefName,headRefName,commits
-# Gitea
-tea pr <N>
-# GitLab
-glab mr view <N>
-
 git fetch origin                   # retry a few times on transient auth failure
 git log --oneline origin/<base>..origin/<head>
 git diff --stat origin/<base>...origin/<head>
@@ -150,21 +143,9 @@ Run at least two workload shapes, because the interesting result is usually wher
 
 ## Phase 7 — Post and clean up
 
-Write the body to a temp Markdown file, then post it with the host's CLI:
+Write the body to a temp Markdown file, then post it as a formal review (approve, request changes, or comment) with your code host's CLI or API. Pass the body as a file rather than an inline string, so the shell does not mangle multi-line Markdown.
 
-```bash
-# GitHub
-gh pr review <N> --request-changes --body-file review.md   # or --approve / --comment
-
-# Gitea (API)
-tea api --method POST repos/<owner>/<repo>/pulls/<N>/reviews \
-  -f "event=REQUEST_CHANGES" -F "body=@review.md"
-
-# GitLab
-glab mr note <N> --message "$(cat review.md)"
-```
-
-- On Gitea, `event` must be `APPROVED` | `REQUEST_CHANGES` | `COMMENT` — **not `APPROVE`**. An unknown value silently creates a `PENDING` draft instead of returning an error.
+- Use the exact review-state value the host expects. Some APIs quietly save an unrecognised value as a draft or pending review instead of returning an error, so a typo looks like success.
 - **Always read the response back** and check the review state matches what you sent.
 - Then clean up: `git worktree remove <path> --force`, drop sandbox tables, confirm the user's checkout is back on its original branch.
 

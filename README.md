@@ -73,7 +73,7 @@ Examples:
 
 It treats every claim in the PR description as something to test. It reviews in a separate git worktree, so your checkout is never touched. It runs the queries and code the PR ships against a sandbox, never against real data, and it measures concurrency with real parallel processes. Findings are sorted into **Blocking**, **Should fix** and **Notes**, and each comes with its evidence.
 
-It works with GitHub (`gh`), Gitea (`tea`) and GitLab (`glab`). Use it for PRs that touch queues, locking, database migrations, concurrency or hot code paths. For a small diff it is more than you need.
+It works with any git host and any SQL database. Use it for PRs that touch queues, locking, database migrations, concurrency or hot code paths. For a small diff it is more than you need.
 
 ## License
 
